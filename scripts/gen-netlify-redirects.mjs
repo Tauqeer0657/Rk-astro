@@ -9,6 +9,11 @@
  * out of sync when a post is added, renamed or removed.
  *
  * Run: node scripts/gen-netlify-redirects.mjs   (wired into `npm run build`)
+ *
+ * NEVER add a rule whose source is the target plus a trailing slash
+ * ("/about-us/  /about-us"). Netlify ignores trailing slashes when matching,
+ * so that rule matches /about-us itself and 301s the page to itself forever.
+ * Netlify handles trailing slashes on its own.
  */
 import { readdirSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
@@ -50,7 +55,6 @@ for (const p of posts) {
   const noExt = p.legacy.replace(/\.html$/, '');
   L.push(`${p.legacy}      /blog/${p.slug}   301!`);
   L.push(`${noExt}         /blog/${p.slug}   301!`);
-  L.push(`${noExt}/        /blog/${p.slug}   301!`);
 }
 L.push('');
 
@@ -62,7 +66,6 @@ L.push('');
 L.push('# --- flat pages: /about-us.html -> /about-us ---');
 for (const s of PAGES) {
   L.push(`/${s}.html        /${s}               301!`);
-  L.push(`/${s}/            /${s}               301!`);
 }
 L.push('');
 
