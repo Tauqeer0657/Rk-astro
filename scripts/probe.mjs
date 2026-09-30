@@ -1,0 +1,18 @@
+import { parse } from 'node-html-parser';
+import fs from 'fs';
+const D=process.env.SRC;
+const f=`${D}/blogs/kidney-stones-risk-factors-causes-and-prevention-tips-25964.html`;
+const r=parse(fs.readFileSync(f,'utf8'));
+console.log('--- banner ---');
+console.log(r.querySelector('.page-banner')?.structuredText.trim().replace(/\s+/g,' ').slice(0,300));
+console.log('--- featured img ---');
+const im=r.querySelector('.post__featured img');
+console.log(im?.getAttribute('src'), '| alt:', im?.getAttribute('alt'));
+console.log('--- meta candidates ---');
+['.post__meta','.post-meta','.meta','time','.badge','.chip','.breadcrumb'].forEach(s=>{const e=r.querySelectorAll(s);if(e.length)console.log(s,'=>',e.slice(0,4).map(x=>x.structuredText.trim().replace(/\s+/g,' ')).join(' | '))});
+console.log('--- body tag counts ---');
+const b=r.querySelector('.post-content');
+const c={}; b.querySelectorAll('*').forEach(e=>c[e.tagName]=(c[e.tagName]||0)+1);
+console.log(JSON.stringify(c));
+console.log('--- body html head ---');
+console.log(b.innerHTML.replace(/\s+/g,' ').slice(0,500));

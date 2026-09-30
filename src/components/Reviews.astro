@@ -1,0 +1,81 @@
+---
+import { Image } from 'astro:assets';
+import ainu from '~/assets/img/ainu-logo.png';
+import reviews from '~/data/reviews.json';
+const PLACE = 'ChIJJyJKrzqbyzsR1fEOESy1CB8';
+const writeUrl = `https://search.google.com/local/writereview?placeid=${PLACE}`;
+const allUrl = `https://search.google.com/local/reviews?placeid=${PLACE}`;
+---
+<section class="section sec-reviews">
+  <div class="container">
+    <header class="sec-head" data-reveal>
+      <span class="eyebrow">Patient Experiences</span>
+      <h2>What Our Patients Say About Us</h2>
+    </header>
+
+    <div class="reviews__summary" data-reveal="left">
+      <Image src={ainu} alt="Asian Institute of Nephrology and Urology" width={64} height={64} loading="lazy" />
+      <div>
+        <strong>Dr Raghavendra Kulkarni — Urologist in Secunderabad</strong>
+        <span class="stars" aria-label="Rated 5 out of 5">★★★★★</span>
+        <span class="reviews__count">56 Google reviews</span>
+      </div>
+      <a class="btn btn--soft btn--sm" href={writeUrl} target="_blank" rel="noopener">Write a review</a>
+    </div>
+
+    <div class="reviews__grid" data-stagger>
+      {reviews.map((r) => (
+        <figure class="review-card">
+          <span class="review-card__stars" aria-label={`Rated ${r.rating} out of 5`}>{'★'.repeat(r.rating)}</span>
+          <blockquote><p class="review-card__text">{r.text}</p></blockquote>
+          {/* revealed by the script below only when the text actually
+              overflows its 4-line clamp — a short review keeps no button */}
+          <button class="review-card__more" type="button" aria-expanded="false" hidden>Read more</button>
+          <figcaption>
+            <span class="review-card__av" aria-hidden="true">{r.name.charAt(0).toUpperCase()}</span>
+            <span>
+              <strong>{r.name}</strong>
+              <em>{r.when}</em>
+            </span>
+          </figcaption>
+        </figure>
+      ))}
+    </div>
+
+    <p class="reviews__more" data-reveal>
+      <a class="ulink" href={allUrl} target="_blank" rel="noopener">Read all reviews on Google →</a>
+    </p>
+  </div>
+</section>
+
+<script>
+  /* Each review is clamped to 4 lines in CSS. Only the ones that actually
+     overflow get a Read more button, so short reviews stay clean. The full
+     text is always in the DOM — the clamp is visual only, so screen readers
+     and Google still see the whole review. */
+  const cards = document.querySelectorAll<HTMLElement>('.review-card');
+
+  const sync = () => {
+    for (const card of cards) {
+      const text = card.querySelector<HTMLElement>('.review-card__text');
+      const btn = card.querySelector<HTMLButtonElement>('.review-card__more');
+      if (!text || !btn) continue;
+      if (card.classList.contains('is-expanded')) continue;   // can't measure while open
+      btn.hidden = text.scrollHeight <= text.clientHeight + 1;
+    }
+  };
+
+  for (const card of cards) {
+    const btn = card.querySelector<HTMLButtonElement>('.review-card__more');
+    btn?.addEventListener('click', () => {
+      const open = card.classList.toggle('is-expanded');
+      btn.setAttribute('aria-expanded', String(open));
+      btn.textContent = open ? 'Read less' : 'Read more';
+    });
+  }
+
+  sync();
+  addEventListener('resize', sync);
+  // re-measure once webfonts land, which changes line heights
+  document.fonts?.ready.then(sync);
+</script>

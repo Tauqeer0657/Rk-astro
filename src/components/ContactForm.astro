@@ -1,0 +1,68 @@
+---
+import { site } from '~/data/site';
+interface Props { compact?: boolean }
+const { compact = false } = Astro.props;
+---
+<form class="cform" data-contact-form novalidate>
+  <div class="cform__row">
+    <label class="field">
+      <span>Full Name<em aria-hidden="true">*</em></span>
+      <input type="text" name="name" required autocomplete="name" placeholder="Your name" />
+    </label>
+    <label class="field">
+      <span>Phone Number<em aria-hidden="true">*</em></span>
+      <input type="tel" name="phone" required autocomplete="tel" inputmode="tel" pattern="[0-9+\-\s]{10,15}" placeholder="10-digit mobile number" />
+    </label>
+  </div>
+  {!compact && (
+    <label class="field">
+      <span>Email Address</span>
+      <input type="email" name="email" autocomplete="email" placeholder="you@example.com" />
+    </label>
+  )}
+  <label class="field">
+    <span>How can we help?</span>
+    <textarea name="message" rows={compact ? 3 : 5} placeholder="Briefly describe your symptom or question"></textarea>
+  </label>
+
+  <!-- honeypot: bots fill this, humans never see it -->
+  <div class="hp" aria-hidden="true"><label>Leave this empty<input type="text" name="company" tabindex="-1" autocomplete="off" /></label></div>
+
+  <button type="submit" class="btn btn--block">Send via WhatsApp</button>
+  <p class="cform__note">
+    Your message opens in WhatsApp to <strong>{site.phone}</strong>. For emergencies, please call directly.
+  </p>
+  <p class="cform__err" data-form-error hidden role="alert"></p>
+</form>
+
+<script>
+  // Progressive enhancement: no backend exists, so the form hands off to
+  // WhatsApp — which is where this practice's enquiries actually arrive.
+  const WA = '917411088875';
+  document.querySelectorAll<HTMLFormElement>('[data-contact-form]').forEach((form) => {
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const err = form.querySelector<HTMLElement>('[data-form-error]');
+      const get = (n: string) => (form.elements.namedItem(n) as HTMLInputElement | null)?.value.trim() ?? '';
+
+      if (get('company')) return; // honeypot tripped
+
+      const name = get('name'), phone = get('phone');
+      if (!name || !phone) {
+        if (err) { err.textContent = 'Please enter your name and phone number.'; err.hidden = false; }
+        return;
+      }
+      if (err) err.hidden = true;
+
+      const lines = [
+        `Name: ${name}`,
+        `Phone: ${phone}`,
+        get('email') && `Email: ${get('email')}`,
+        get('message') && `Message: ${get('message')}`,
+      ].filter(Boolean);
+
+      window.open(`https://wa.me/${WA}?text=${encodeURIComponent(lines.join('\n'))}`, '_blank', 'noopener');
+      form.reset();
+    });
+  });
+</script>

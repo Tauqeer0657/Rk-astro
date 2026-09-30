@@ -1,0 +1,86 @@
+---
+import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
+import Base from '~/layouts/Base.astro';
+import Icon from '~/components/Icon.astro';
+import Faq from '~/components/Faq.astro';
+import { site } from '~/data/site';
+import { faqs } from '~/data/home';
+import { pageUrl } from '~/data/urls';
+import { breadcrumbSchema, faqSchema } from '~/data/schema';
+
+const svcs = (await getCollection('services')).sort((a, b) => a.data.order - b.data.order);
+const path = pageUrl('services');
+const crumbs = [{ name: 'Home', url: '/' }, { name: 'Services', url: path }];
+
+const journey = [
+  { n: '01', h: 'Consultation', p: 'A detailed history and examination — bring old reports, scans and current medicines.' },
+  { n: '02', h: 'Investigation', p: 'Targeted tests only: ultrasound, CT-KUB, uroflowmetry, PSA or cultures as required.' },
+  { n: '03', h: 'Treatment', p: 'Medical management, endoscopic laser procedure or laparoscopic surgery — with the estimate given upfront.' },
+  { n: '04', h: 'Follow-Up', p: 'Stent removal, diet and prevention plan, and periodic review to keep the problem from returning.' },
+];
+---
+<Base
+  title="Urology Services in Secunderabad"
+  description="Specialized urology services by Dr Raghavendra Kulkarni in Secunderabad: advanced prostate care, laser kidney stone treatment, urological cancer care and more."
+  path={path}
+  schemas={[breadcrumbSchema(crumbs), faqSchema(faqs)]}
+>
+  <section class="page-banner">
+    <div class="container">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <ol>{crumbs.map((c, i) => <li>{i < crumbs.length - 1 ? <a href={c.url}>{c.name}</a> : <span aria-current="page">{c.name}</span>}</li>)}</ol>
+      </nav>
+      <h1>Specialized Urology Services</h1>
+      <p class="page-banner__sub">Advanced, minimally invasive treatment for stones, prostate disease, urological cancers and men’s health.</p>
+    </div>
+  </section>
+
+  <section class="section sec-services">
+    <div class="container">
+      <div class="svc__grid svc__grid--lg" data-stagger>
+        {svcs.map((s) => (
+          <a class="svc-card" href={pageUrl(s.id)}>
+            <div class="svc-card__img">
+              <Image src={s.data.hero} alt={s.data.title} widths={[320, 620]} sizes="(max-width: 700px) 90vw, 320px" loading="lazy" />
+            </div>
+            <h2>{s.data.title}</h2>
+            <p>{s.data.short}</p>
+            <span class="svc-card__go">Read more <Icon name="arrow" size={16} /></span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--lavender">
+    <div class="container">
+      <header class="sec-head" data-reveal>
+        <span class="eyebrow">How It Works</span>
+        <h2>Your Treatment Journey, Step by Step</h2>
+      </header>
+      <div class="journey" data-stagger>
+        {journey.map((j) => (
+          <article class="journey__step">
+            <span class="journey__n">{j.n}</span>
+            <h3>{j.h}</h3>
+            <p>{j.p}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <Faq items={faqs} />
+
+  <section class="section sec-consult">
+    <div class="container consult__cta" data-reveal="zoom">
+      <h2>Ready to get a clear answer?</h2>
+      <p>Book a consultation and get an honest assessment of what is actually needed.</p>
+      <div class="hero__cta">
+        <a class="btn" href={pageUrl('contact-us')}>Book Appointment</a>
+        <a class="btn btn--soft" href={site.phoneHref}><Icon name="phone" size={17} /> {site.phone}</a>
+      </div>
+    </div>
+  </section>
+</Base>

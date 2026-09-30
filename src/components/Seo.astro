@@ -1,0 +1,76 @@
+---
+import { site } from '~/data/site';
+import { physicianSchema, websiteSchema } from '~/data/schema';
+
+interface Props {
+  title: string;
+  description: string;
+  /** Path only, e.g. "/about-us.html" — canonical is built from it. */
+  path: string;
+  image?: string;
+  type?: 'website' | 'article';
+  noindex?: boolean;
+  /** Extra JSON-LD graphs for this page (Article, FAQ, Breadcrumb…). */
+  schemas?: unknown[];
+  publishedTime?: Date;
+  modifiedTime?: Date;
+}
+
+const {
+  title, description, path, image,
+  type = 'website', noindex = false, schemas = [],
+  publishedTime, modifiedTime,
+} = Astro.props;
+
+// Google Search Console verification. Set GSC_VERIFICATION in the build env
+// (or hardcode it in src/data/site.ts) and the tag renders on every page.
+const gscToken = import.meta.env.GSC_VERIFICATION ?? '';
+
+const canonical = new URL(path, site.url).href;
+const ogImage = new URL(image ?? '/og-default.jpg', site.url).href;
+// Append the brand only while the result still fits inside Google's ~60-char
+// display limit — a truncated brand suffix helps nobody.
+const BRAND = ' | Dr. Raghavendra Kulkarni';
+const fullTitle =
+  title.includes('Raghavendra') || path === '/'
+    ? title
+    : title.length + BRAND.length <= 60
+      ? title + BRAND
+      : title;
+
+// site-wide graphs render once on every page; Google dedupes by @id
+const graphs = [physicianSchema(new URL('/favicon.png', site.url).href), websiteSchema(), ...schemas];
+---
+{gscToken && <meta name="google-site-verification" content={gscToken} />}
+<title>{fullTitle}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical} />
+{noindex
+  ? <meta name="robots" content="noindex, nofollow" />
+  : <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />}
+
+<meta property="og:type" content={type} />
+<meta property="og:site_name" content={site.name} />
+<meta property="og:locale" content={site.locale} />
+<meta property="og:title" content={fullTitle} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+<meta property="og:image" content={ogImage} />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+{publishedTime && <meta property="article:published_time" content={publishedTime.toISOString()} />}
+{modifiedTime && <meta property="article:modified_time" content={modifiedTime.toISOString()} />}
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={fullTitle} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={ogImage} />
+
+<meta name="geo.region" content="IN-TG" />
+<meta name="geo.placename" content={site.clinic.locality} />
+<meta name="geo.position" content={`${site.clinic.lat};${site.clinic.lng}`} />
+<meta name="author" content={site.name} />
+
+{graphs.map((g) => (
+  <script type="application/ld+json" set:html={JSON.stringify(g)} />
+))}

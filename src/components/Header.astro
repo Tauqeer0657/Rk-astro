@@ -1,0 +1,80 @@
+---
+import { Image } from 'astro:assets';
+import logo from '~/assets/img/logo.jpg';
+import Icon from './Icon.astro';
+import { site, services } from '~/data/site';
+import { pageUrl } from '~/data/urls';
+
+const here = Astro.url.pathname;
+const is = (href: string) => here === href || (href !== '/' && here.startsWith(href.replace(/\.html$/, '')));
+
+const links = [
+  { label: 'Home', href: '/' },
+  { label: 'About Us', href: pageUrl('about-us') },
+  { label: 'Services', href: pageUrl('services'), sub: services.map((s) => ({ label: s.title, href: pageUrl(s.slug) })) },
+  { label: 'Blog', href: pageUrl('blog') },
+  { label: 'Gallery', href: pageUrl('gallery') },
+  { label: 'Contact Us', href: pageUrl('contact-us') },
+];
+---
+<div class="topbar">
+  <div class="container topbar__inner">
+    <a href={site.phoneHref} class="topbar__item"><Icon name="phone" size={15} /> {site.phone}</a>
+    <a href={`mailto:${site.email}`} class="topbar__item"><Icon name="mail" size={15} /> {site.email}</a>
+    <span class="topbar__item topbar__hours"><Icon name="clock" size={15} /> {site.hoursLabel}</span>
+    <span class="topbar__social">
+      <a href={site.social.facebook} target="_blank" rel="noopener" aria-label="Facebook"><Icon name="facebook" size={15} /></a>
+      <a href={site.social.instagram} target="_blank" rel="noopener" aria-label="Instagram"><Icon name="instagram" size={15} /></a>
+      <a href={site.social.youtube} target="_blank" rel="noopener" aria-label="YouTube"><Icon name="youtube" size={15} /></a>
+    </span>
+  </div>
+</div>
+
+<header class="header" data-header>
+  <div class="header__in container">
+    <a href="/" class="brand" aria-label={`${site.name} — home`}>
+      <Image src={logo} alt={`${site.name} — Consultant Urologist, Secunderabad`} width={190} height={56} loading="eager" />
+    </a>
+
+    <nav aria-label="Main">
+      <ul class="nav__menu anim-up anim-up--d1">
+        {links.map((l) => (
+          <li class={is(l.href) ? 'is-active' : ''}>
+            <a href={l.href} aria-current={is(l.href) ? 'page' : undefined}>
+              {l.label}{l.sub && <Icon name="caret" size={16} class="caret" />}
+            </a>
+            {l.sub && (
+              <div class="dropdown">
+                {l.sub.map((s) => <a href={s.href}>{s.label}</a>)}
+              </div>
+            )}
+          </li>
+        ))}
+      </ul>
+    </nav>
+
+    <div class="nav__right anim-up anim-up--d2">
+      <a href={site.phoneHref} class="btn btn--soft btn--sm"><Icon name="phone" size={16} /> Call</a>
+      <a href={pageUrl('contact-us')} class="btn btn--sm">Book Appointment</a>
+      <button class="burger" data-drawer-open aria-expanded="false" aria-controls="m-drawer" aria-label="Open menu">
+        <Icon name="burger" size={24} />
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="drawer" id="m-drawer" data-drawer>
+  <div class="drawer__head">
+    <span>Menu</span>
+    <button class="drawer__x" data-drawer-close aria-label="Close menu"><Icon name="close" size={22} /></button>
+  </div>
+  <ul class="drawer__menu">
+    {links.map((l) => (
+      <li>
+        <a href={l.href}>{l.label}</a>
+        {l.sub && <div class="drawer__sub">{l.sub.map((s) => <a href={s.href}>— {s.label}</a>)}</div>}
+      </li>
+    ))}
+  </ul>
+  <a href={pageUrl('contact-us')} class="btn btn--block">Book Appointment</a>
+</div>

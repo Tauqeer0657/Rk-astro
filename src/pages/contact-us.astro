@@ -1,0 +1,79 @@
+---
+import Base from '~/layouts/Base.astro';
+import Icon from '~/components/Icon.astro';
+import ContactForm from '~/components/ContactForm.astro';
+import { site } from '~/data/site';
+import { pageUrl } from '~/data/urls';
+import { breadcrumbSchema } from '~/data/schema';
+
+const path = pageUrl('contact-us');
+const crumbs = [{ name: 'Home', url: '/' }, { name: 'Contact Us', url: path }];
+const { clinic } = site;
+---
+<Base
+  title="Contact Dr Raghavendra Kulkarni — Urologist in Secunderabad"
+  description="Book an appointment with Dr Raghavendra Kulkarni at the Asian Institute of Nephrology and Urology, Vikrampuri Colony, Karkhana, Secunderabad. Call +91-7411088875."
+  path={path}
+  schemas={[breadcrumbSchema(crumbs)]}
+>
+  <section class="page-banner">
+    <div class="container">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <ol>{crumbs.map((c, i) => <li>{i < crumbs.length - 1 ? <a href={c.url}>{c.name}</a> : <span aria-current="page">{c.name}</span>}</li>)}</ol>
+      </nav>
+      <h1>Contact Us</h1>
+      <p class="page-banner__sub">Call, WhatsApp or send an enquiry — we usually respond the same day.</p>
+    </div>
+  </section>
+
+  <section class="section sec-contact">
+    <div class="container contact__grid">
+      <div class="contact__info" data-stagger>
+        <article class="contact-card">
+          <i><Icon name="pin" size={20} /></i>
+          <h2>Clinic Address</h2>
+          <address>
+            {clinic.name}<br />
+            {clinic.street}<br />
+            {clinic.locality}, {clinic.region} – {clinic.postalCode}
+          </address>
+        </article>
+        <article class="contact-card">
+          <i><Icon name="phone" size={20} /></i>
+          <h2>Phone &amp; WhatsApp</h2>
+          <p><a href={site.phoneHref}>{site.phone}</a></p>
+          <a class="btn btn--soft btn--sm" href={site.whatsapp} target="_blank" rel="noopener">Chat on WhatsApp</a>
+        </article>
+        <article class="contact-card">
+          <i><Icon name="mail" size={20} /></i>
+          <h2>Email</h2>
+          <p><a href={`mailto:${site.email}`}>{site.email}</a></p>
+        </article>
+        <article class="contact-card">
+          <i><Icon name="clock" size={20} /></i>
+          <h2>Consulting Hours</h2>
+          <p>{site.hoursLabel}</p>
+        </article>
+      </div>
+
+      <div class="contact__form" data-reveal="right">
+        <h2>Send an Enquiry</h2>
+        <ContactForm />
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--tight">
+    <div class="container">
+      <div class="map" data-reveal>
+        <iframe
+          title={`Map to ${clinic.name}, ${clinic.locality}`}
+          src={clinic.mapEmbed}
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+          allowfullscreen
+        ></iframe>
+      </div>
+    </div>
+  </section>
+</Base>

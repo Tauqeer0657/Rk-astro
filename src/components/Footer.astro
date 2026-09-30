@@ -1,0 +1,64 @@
+---
+import { Image } from 'astro:assets';
+import logo from '~/assets/img/logo.jpg';
+import Icon from './Icon.astro';
+import { site, services } from '~/data/site';
+import { pageUrl } from '~/data/urls';
+const { clinic } = site;
+---
+<footer class="footer">
+  <div class="container">
+    <div class="footer__grid">
+      <div>
+        <div class="footer__logo">
+          <Image src={logo} alt={site.name} width={180} height={54} loading="lazy" />
+        </div>
+        <p>
+          Consultant Urologist in Secunderabad — kidney stones, prostate care, urological cancers
+          and men’s health, treated with the gentlest effective approach.
+        </p>
+        <div class="footer__social">
+          <a href={site.social.facebook} target="_blank" rel="noopener" aria-label="Facebook"><Icon name="facebook" size={18} /></a>
+          <a href={site.social.instagram} target="_blank" rel="noopener" aria-label="Instagram"><Icon name="instagram" size={18} /></a>
+          <a href={site.social.youtube} target="_blank" rel="noopener" aria-label="YouTube"><Icon name="youtube" size={18} /></a>
+        </div>
+      </div>
+
+      <div>
+        <h2 class="footer__col-h">Quick Links</h2>
+        <ul class="footer__links">
+          <li><a href="/">Home</a></li>
+          <li><a href={pageUrl('about-us')}>About Us</a></li>
+          <li><a href={pageUrl('services')}>Services</a></li>
+          <li><a href={pageUrl('gallery')}>Gallery</a></li>
+          <li><a href={pageUrl('blog')}>Blog</a></li>
+          <li><a href={pageUrl('contact-us')}>Contact Us</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h2 class="footer__col-h">Treatments</h2>
+        <ul class="footer__links">
+          {services.map((s) => <li><a href={pageUrl(s.slug)}>{s.title}</a></li>)}
+        </ul>
+      </div>
+
+      <div>
+        <h2 class="footer__col-h">Reach Us</h2>
+        <ul class="footer__c">
+          <li>
+            <i><Icon name="pin" size={17} /></i>
+            <address>{clinic.name}, {clinic.street}, {clinic.locality}, {clinic.region} – {clinic.postalCode}</address>
+          </li>
+          <li><i><Icon name="phone" size={17} /></i><a href={site.phoneHref}>{site.phone}</a></li>
+          <li><i><Icon name="mail" size={17} /></i><a href={`mailto:${site.email}`}>{site.email}</a></li>
+          <li><i><Icon name="clock" size={17} /></i><span>{site.hoursLabel}</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer__bottom">
+      <p>&copy; <span data-year>2026</span>. {site.name}. All Rights Reserved.</p>
+    </div>
+  </div>
+</footer>

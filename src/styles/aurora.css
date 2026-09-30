@@ -1,0 +1,424 @@
+/* ==========================================================================
+   THEME 3 — "AURORA"
+   Dr. Raghavendra Kulkarni · Senior Consultant Urologist · Hyderabad
+   Soft gradient mesh · glassmorphism · generous radii · patient-first warmth
+   ========================================================================== */
+
+:root {
+  --teal-900: #08403c;
+  --teal-800: #0b5c56;
+  --teal:     #0d9488;
+  --teal-700: #0f766e;   /* 4.6:1 on white — use for small text/links */
+  --teal-400: #2dd4bf;
+  --teal-100: #ccfbf1;
+  --teal-50:  #f0fdfa;
+
+  --indigo:   #6366f1;
+  --indigo-100:#e0e7ff;
+  --sky:      #38bdf8;
+  --sky-100:  #e0f2fe;
+  --coral:    #fb7185;
+  --coral-700:#c02a49;   /* accessible on white; --coral is decorative only */
+  --amber:    #f59e0b;
+  --amber-700:#a8620a;   /* accessible text/star colour; --amber is decorative fills only */
+
+  --ink:      #0c2b2e;
+  --ink-2:    #33565a;
+  --body:     #52706f;   /* 4.9:1 on --bg, was #5f7d81 at 4.23:1 */
+  --white:    #ffffff;
+  --bg:       #f4fbfb;
+  --line:     #e2f0ef;
+
+  --font-display: "Outfit", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-body:    "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+  --container: 1220px;
+  --r:    18px;
+  --r-lg: 28px;
+  --r-xl: 40px;
+
+  --sh-s: 0 6px 20px rgba(13, 148, 136, .07);
+  --sh:   0 18px 44px rgba(13, 148, 136, .11);
+  --sh-l: 0 34px 80px rgba(12, 43, 46, .14);
+
+  /* ---- motion scale -------------------------------------------------
+     One curve, four durations. Every transition in the codebase picks a
+     step from this ladder so nothing animates at an off-scale speed.
+       1 micro   hover colours, underlines
+       2 control buttons, icons, cards
+       3 panel   accordion, drawer, overlay
+       4 reveal  scroll entrances
+     --------------------------------------------------------------- */
+  --ease:   cubic-bezier(.22, .61, .36, 1);   /* matches the live site's curve */
+  --dur-1:  .25s;
+  --dur-2:  .35s;
+  --dur-3:  .45s;
+  --dur-4:  .55s;
+
+  /* ---- scroll-entrance, ported from the live site -------------------
+     raghavendrakulkarni.com uses a slow, unhurried entrance: a 1.3s
+     animation on a generous travel distance, siblings 180ms apart.
+     These are its exact values. ------------------------------------- */
+  --reveal-duration: 1.3s;
+  --reveal-step:     .18s;
+  --reveal-ease:     cubic-bezier(.22, .61, .36, 1);
+  --reveal-up:       42px;
+  --reveal-side:     70px;
+}
+
+/* lets block-size: auto animate (accordion), ignored where unsupported */
+:root { interpolate-size: allow-keywords; }
+
+*, *::before, *::after { box-sizing: border-box; }
+
+/* The blog category filter toggles the `hidden` attribute, but .blog-card
+   and .blog-lead declare display:flex/grid, which outranks the UA's
+   [hidden]{display:none}. Without this the filter silently does nothing. */
+[hidden] { display: none !important; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; scroll-padding-top: 120px; }
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 16.5px;
+  line-height: 1.75;
+  color: var(--body);
+  background: var(--bg);
+  /* overflow-x lives in components.css as `clip` — `hidden` would create a
+     scroll container and silently break every position: sticky on the page */
+  -webkit-font-smoothing: antialiased;
+}
+
+img, svg { max-width: 100%; display: block; }
+img { height: auto; border: 0; }
+a { color: var(--teal); text-decoration: none; transition: color var(--dur-1) var(--ease); }
+a:hover { color: var(--teal-800); }
+ul, ol { margin: 0; padding: 0; list-style: none; }
+p { margin: 0 0 1.1em; }
+p:last-child { margin-bottom: 0; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; border: 0; background: none; }
+::selection { background: var(--teal-400); color: #04302c; }
+
+h1, h2, h3, h4, h5 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.18;
+  letter-spacing: -.025em;
+}
+h1 { font-size: clamp(2.5rem, 1.4rem + 4.2vw, 4.4rem); font-weight: 600; line-height: 1.08; }
+h2 { font-size: clamp(1.95rem, 1.2rem + 2.7vw, 3.05rem); }
+h3 { font-size: clamp(1.2rem, 1.05rem + .7vw, 1.5rem); }
+h4 { font-size: 1.13rem; }
+
+.container { width: 100%; max-width: var(--container); margin-inline: auto; padding-inline: 24px; }
+.section { padding: clamp(62px, 6.5vw, 112px) 0; position: relative; }
+
+/* ------------------------------------------------------------ helpers -- */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 18px;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 100px;
+  font-family: var(--font-display);
+  font-size: .84rem;
+  font-weight: 600;
+  color: var(--teal-800);
+  box-shadow: var(--sh-s);
+  margin-bottom: 22px;
+}
+.chip i { width: 7px; height: 7px; border-radius: 50%; background: var(--teal-400); box-shadow: 0 0 0 4px var(--teal-100); }
+
+/* ------------------------------------------------------------- button -- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 16px 32px;
+  white-space: nowrap;      /* a button label wrapping breaks the header height */
+  /* transparent border so .btn and .btn--soft (which has a real 1px border)
+     resolve to the identical height — otherwise sibling CTAs sit 2px apart */
+  border: 1px solid transparent;
+  min-height: 52px;
+  font-family: var(--font-display);
+  font-size: .96rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: #fff;
+  background: linear-gradient(120deg, var(--teal), var(--teal-800));
+  border-radius: 100px;
+  box-shadow: 0 12px 28px rgba(13, 148, 136, .28);
+  transition: transform var(--dur-2) var(--ease), box-shadow var(--dur-2) var(--ease), background var(--dur-2) var(--ease), color var(--dur-2) var(--ease);
+}
+.btn:hover { color: #fff; transform: translateY(-3px); box-shadow: 0 20px 40px rgba(13, 148, 136, .34); }
+.btn svg { width: 17px; height: 17px; }
+
+.btn--soft { background: var(--white); color: var(--teal-800); box-shadow: var(--sh-s); border: 1px solid var(--line); }
+.btn--soft:hover { color: var(--teal); box-shadow: var(--sh); }
+.btn--block { width: 100%; }
+.btn--sm { padding: 11px 22px; font-size: .9rem; min-height: 44px; }
+
+/* -------------------------------------------------------------- header -- */
+.header {
+  position: sticky;
+  top: 16px;
+  z-index: 90;
+  padding-inline: 24px;
+  margin-top: 16px;
+}
+.header__in {
+  max-width: var(--container);
+  margin-inline: auto;
+  background: rgba(255,255,255,.78);
+  backdrop-filter: saturate(180%) blur(18px);
+  border: 1px solid rgba(255,255,255,.9);
+  border-radius: 100px;
+  box-shadow: 0 10px 34px rgba(12,43,46,.07);
+  padding: 10px 12px 10px 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 22px;
+  transition: box-shadow var(--dur-3) var(--ease), background var(--dur-3) var(--ease);
+}
+.header.is-stuck .header__in { box-shadow: 0 16px 44px rgba(12,43,46,.12); background: rgba(255,255,255,.92); }
+.brand img { height: 46px; width: auto; }
+
+.nav__menu { display: flex; align-items: center; gap: 6px; }
+.nav__menu > li { position: relative; }
+.nav__menu > li > a {
+  display: inline-flex; align-items: center; gap: 6px;
+  white-space: nowrap;      /* "About Us" must never break across two lines */
+  padding: 10px 16px;
+  border-radius: 100px;
+  font-family: var(--font-display);
+  font-size: .94rem;
+  font-weight: 500;
+  color: var(--ink-2);
+  transition: all var(--dur-2) var(--ease);
+}
+.nav__menu > li > a:hover, .nav__menu > li.is-active > a { background: var(--teal-50); color: var(--teal-800); }
+.caret { width: 11px; height: 11px; opacity: .5; transition: transform var(--dur-1) var(--ease); }
+.nav__menu > li:hover .caret { transform: rotate(180deg); }
+
+.dropdown {
+  position: absolute; top: calc(100% + 14px); left: 0;
+  min-width: 260px; padding: 10px;
+  background: rgba(255,255,255,.96);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  box-shadow: var(--sh);
+  opacity: 0; visibility: hidden; transform: translateY(10px);
+  transition: all var(--dur-2) var(--ease);
+}
+.nav__menu > li:hover .dropdown { opacity: 1; visibility: visible; transform: none; }
+.dropdown a { display: block; padding: 11px 16px; border-radius: 14px; font-size: .92rem; color: var(--ink-2); font-weight: 500; }
+.dropdown a:hover { background: var(--teal-50); color: var(--teal-800); }
+
+.nav__right { display: flex; align-items: center; gap: 12px; }
+.burger { display: none; width: 44px; height: 44px; border-radius: 50%; background: var(--teal-50); color: var(--teal-800); place-items: center; }
+.burger svg { width: 21px; height: 21px; }
+
+.drawer {
+  position: fixed; inset: 12px 12px 12px auto;
+  width: min(340px, 86vw);
+  background: #fff;
+  border-radius: var(--r-xl);
+  z-index: 120; padding: 24px;
+  overflow-y: auto;
+  transform: translateX(115%);
+  transition: transform var(--dur-3) var(--ease);
+  box-shadow: var(--sh-l);
+}
+.drawer.is-open { transform: none; }
+.drawer nav a {
+  display: block; padding: 14px 16px; border-radius: 16px;
+  font-family: var(--font-display); font-weight: 500; font-size: 1.02rem;
+  color: var(--ink);
+}
+.drawer nav a:hover { background: var(--teal-50); color: var(--teal-800); }
+.drawer .btn { margin-top: 20px; }
+.overlay { position: fixed; inset: 0; background: rgba(8,45,48,.4); backdrop-filter: blur(4px); z-index: 100; opacity: 0; visibility: hidden; transition: opacity var(--dur-3) var(--ease), visibility var(--dur-3) var(--ease); }
+.overlay.is-open { opacity: 1; visibility: visible; }
+
+/* ---------------------------------------------------------------- hero -- */
+.hero { position: relative; padding: clamp(52px, 6vw, 90px) 0 clamp(60px, 6vw, 100px); overflow: hidden; }
+.hero .container { position: relative; z-index: 2; }
+.hero h1 { margin-bottom: 22px; }
+
+.hero__pills { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 34px; }
+.hero__pills span {
+  padding: 9px 18px;
+  border-radius: 100px;
+  background: rgba(255,255,255,.7);
+  border: 1px solid var(--line);
+  font-size: .87rem;
+  font-weight: 500;
+  color: var(--ink-2);
+}
+.ticks { display: grid; gap: 14px; margin: 26px 0 32px; }
+.ticks li { display: flex; gap: 13px; align-items: flex-start; color: var(--ink-2); font-size: .99rem; }
+.ticks i { flex: none; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; background: var(--teal-100); color: var(--teal-800); margin-top: 3px; }
+.ticks svg { width: 13px; height: 13px; }
+.ticks--2 { grid-template-columns: 1fr 1fr; column-gap: 24px; }
+
+/* ----------------------------------------------------------------- faq -- */
+/* Markup is native <details>/<summary> (see components/Faq.astro).
+   Open/close animates via ::details-content where supported; browsers
+   without it simply snap open, which is still fully readable. */
+.faq { display: grid; gap: 14px; }
+.faq__item {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  overflow: hidden;
+  transition: box-shadow var(--dur-2) var(--ease), border-color var(--dur-2) var(--ease);
+}
+.faq__item[open] { border-color: var(--teal-100); box-shadow: var(--sh-s); }
+
+.faq__item > summary {
+  display: flex; align-items: center; justify-content: space-between; gap: 18px;
+  padding: 20px 24px; cursor: pointer; list-style: none;
+  font-family: var(--font-display); font-size: 1.02rem; font-weight: 600;
+  color: var(--ink); line-height: 1.45;
+  transition: background var(--dur-1) var(--ease);
+}
+.faq__item > summary::-webkit-details-marker { display: none; }
+.faq__item > summary::marker { content: ""; }
+.faq__item > summary:hover { background: var(--teal-50); }
+
+.faq__item > summary svg {
+  flex: none; width: 32px; height: 32px; padding: 8px;
+  border-radius: 50%; background: var(--teal-50); color: var(--teal-800);
+  transition: transform var(--dur-2) var(--ease), background var(--dur-2) var(--ease), color var(--dur-2) var(--ease);
+}
+.faq__item[open] > summary svg {
+  transform: rotate(180deg);
+  background: linear-gradient(135deg, var(--teal), var(--teal-400));
+  color: #fff;
+}
+
+.faq__a { padding: 0 24px 22px; font-size: .97rem; }
+.faq__a p { margin: 0; }
+
+/* smooth height animation on browsers that expose ::details-content */
+@supports selector(details::details-content) {
+  .faq__item::details-content {
+    block-size: 0; overflow: hidden;
+    transition: block-size var(--dur-3) var(--ease), content-visibility var(--dur-3) allow-discrete;
+    content-visibility: hidden;
+  }
+  .faq__item[open]::details-content { block-size: auto; content-visibility: visible; }
+}
+
+/* -------------------------------------------------------------- footer -- */
+.footer {
+  background: linear-gradient(180deg, #062a2c, #04201f);
+  color: rgba(255,255,255,.62);
+  border-radius: var(--r-xl) var(--r-xl) 0 0;
+  padding: clamp(52px, 6vw, 84px) 0 0;
+  margin-top: 40px;
+}
+.footer__grid { display: grid; grid-template-columns: 1.5fr 1fr 1fr 1.3fr; gap: 42px; padding-bottom: 48px; }
+.footer__logo { background: #fff; border-radius: 16px; padding: 12px 16px; display: inline-block; margin-bottom: 20px; }
+.footer__logo img { height: 44px; }
+.footer p { font-size: .94rem; }
+.footer__col-h { font-family: var(--font-display); font-size: 1.02rem; color: #fff; margin: 0 0 22px; font-weight: 600; }
+.footer__links li + li { margin-top: 2px; }
+/* inline-block + vertical padding gives these a >=24px hit area on touch;
+   they were 20px tall links with only outer margin */
+.footer__links a { color: rgba(255,255,255,.62); font-size: .94rem; display: inline-block; padding: 6px 0; transition: color var(--dur-1) var(--ease), padding-left var(--dur-1) var(--ease); }
+.footer__links a:hover { color: var(--teal-400); padding-left: 5px; }
+/* Layout only — this list is reused on the light homepage "Reach Out to Us"
+   block, so the dark-on-teal colours below are scoped to .footer itself. */
+.footer__c li { display: flex; gap: 13px; margin-bottom: 17px; font-size: .94rem; }
+.footer__c i { flex: none; width: 36px; height: 36px; border-radius: 12px; background: var(--teal-50); color: var(--teal); display: grid; place-items: center; }
+.footer__c svg { width: 15px; height: 15px; }
+.footer__c a, .footer__c address, .footer__c span { color: var(--ink-2); }
+.footer__c a:hover { color: var(--teal); }
+
+.footer .footer__c i { background: rgba(255,255,255,.07); color: var(--teal-400); }
+.footer .footer__c a, .footer .footer__c address, .footer .footer__c span { color: rgba(255,255,255,.62); }
+.footer .footer__c a:hover { color: var(--teal-400); }
+.footer__social { display: flex; gap: 10px; margin-top: 22px; }
+.footer__social a { width: 40px; height: 40px; border-radius: 14px; background: rgba(255,255,255,.07); color: #fff; display: grid; place-items: center; transition: all var(--dur-1) var(--ease); }
+.footer__social a:hover { background: var(--teal); transform: translateY(-3px); }
+.footer__social svg { width: 16px; height: 16px; }
+.footer__bottom {
+  border-top: 1px solid rgba(255,255,255,.09);
+  padding: 22px 0;
+  display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap;
+  font-size: .87rem;
+}
+.footer__bottom nav { display: flex; gap: 20px; }
+.footer__bottom a { color: rgba(255,255,255,.62); }
+.footer__bottom a:hover { color: var(--teal-400); }
+.field { margin-bottom: 18px; }
+.field label { display: block; font-family: var(--font-display); font-size: .86rem; font-weight: 600; color: var(--ink); margin-bottom: 8px; }
+.field input, .field select, .field textarea {
+  width: 100%;
+  padding: 14px 18px;
+  border: 1.5px solid var(--line);
+  border-radius: 16px;
+  background: #fff;
+  font-size: .96rem;
+  color: var(--ink);
+  transition: all var(--dur-1) var(--ease);
+  font-family: var(--font-body);
+}
+.field textarea { min-height: 110px; resize: vertical; }
+.field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--teal-400); box-shadow: 0 0 0 4px var(--teal-50); }
+.field input::placeholder, .field textarea::placeholder { color: #9db8b9; }
+
+/* ------------------------------------------------------------- reveal -- */
+/* Keyframe-driven entrance, ported from the live site. Gated on .js so
+   that with JavaScript off every element is visible at full opacity
+   instead of a blank page (the live site has that bug; we don't). */
+@keyframes revealUp    { from { opacity: 0; transform: translate3d(0, var(--reveal-up), 0); }            to { opacity: 1; transform: none; } }
+@keyframes revealDown  { from { opacity: 0; transform: translate3d(0, calc(var(--reveal-up) * -1), 0); } to { opacity: 1; transform: none; } }
+@keyframes revealLeft  { from { opacity: 0; transform: translate3d(calc(var(--reveal-side) * -1), 0, 0); } to { opacity: 1; transform: none; } }
+@keyframes revealRight { from { opacity: 0; transform: translate3d(var(--reveal-side), 0, 0); }          to { opacity: 1; transform: none; } }
+@keyframes revealZoom  { from { opacity: 0; transform: scale(.92); }                                     to { opacity: 1; transform: none; } }
+@keyframes revealFade  { from { opacity: 0; }                                                            to { opacity: 1; } }
+
+.js [data-reveal] { opacity: 0; }
+.js [data-reveal].is-in {
+  animation-name: revealUp;
+  animation-duration: var(--reveal-duration);
+  animation-timing-function: var(--reveal-ease);
+  animation-fill-mode: both;
+}
+.js [data-reveal][data-delay="1"].is-in { animation-delay: calc(var(--reveal-step) * 1); }
+.js [data-reveal][data-delay="2"].is-in { animation-delay: calc(var(--reveal-step) * 2); }
+.js [data-reveal][data-delay="3"].is-in { animation-delay: calc(var(--reveal-step) * 3); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+  .js [data-reveal], .js [data-reveal].is-in { opacity: 1; transform: none; animation: none; }
+}
+
+/* --------------------------------------------------------- responsive -- */
+@media (max-width: 1100px) {
+  .footer__grid { grid-template-columns: 1fr 1fr; }
+}
+/* Measured: the full desktop nav (6 links + Call + Book Appointment) only
+   fits from 1132px up. Between 992-1131px it used to wrap "About Us",
+   "Contact Us" and "Book Appointment" onto two lines and grow the header
+   from 74px to 95px. The drawer owns navigation below that. */
+@media (max-width: 1131px) {
+  .nav__menu { display: none; }
+  .burger { display: grid; }
+  .header__in { padding: 10px 10px 10px 18px; }
+}
+@media (max-width: 700px) {
+  .ticks--2 { grid-template-columns: 1fr; }
+  .footer__grid { grid-template-columns: 1fr; gap: 32px; }
+  .footer__bottom { flex-direction: column; text-align: center; }
+}

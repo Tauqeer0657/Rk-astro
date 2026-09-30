@@ -1,0 +1,89 @@
+---
+import { Image, getImage } from 'astro:assets';
+import Base from '~/layouts/Base.astro';
+import { pageUrl } from '~/data/urls';
+import { breadcrumbSchema } from '~/data/schema';
+
+const files = import.meta.glob<{ default: ImageMetadata }>('~/assets/media/*.{jpg,png,webp}', { eager: true });
+
+/** The grid renders 320/640px thumbnails. The lightbox needs its own
+ *  full-size render — handing it the thumbnail's currentSrc is what made
+ *  the viewer open at 320px wide. */
+const media = await Promise.all(
+  Object.entries(files).map(async ([p, m]) => ({
+    src: m.default,
+    key: p,
+    full: (await getImage({ src: m.default, width: Math.min(m.default.width, 1600), format: 'webp' })).src,
+  }))
+);
+
+/** TODO(client): replace these generic captions with real ones —
+ *  descriptive alt text is what gets a clinic into Google Images. */
+const captions: Record<string, string> = {};
+const caption = (k: string) =>
+  captions[k] ?? 'Dr. Raghavendra Kulkarni — urology practice at AINU, Secunderabad';
+
+const path = pageUrl('gallery');
+const crumbs = [{ name: 'Home', url: '/' }, { name: 'Gallery', url: path }];
+---
+<Base
+  title="Gallery — Dr Raghavendra Kulkarni, Urologist Secunderabad"
+  description="Photographs from the urology practice of Dr Raghavendra Kulkarni at the Asian Institute of Nephrology and Urology, Secunderabad."
+  path={path}
+  schemas={[breadcrumbSchema(crumbs)]}
+>
+  <section class="page-banner">
+    <div class="container">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <ol>{crumbs.map((c, i) => <li>{i < crumbs.length - 1 ? <a href={c.url}>{c.name}</a> : <span aria-current="page">{c.name}</span>}</li>)}</ol>
+      </nav>
+      <h1>Gallery</h1>
+      <p class="page-banner__sub">Moments from the clinic, the team and the practice.</p>
+    </div>
+  </section>
+
+  <section class="section sec-gallery">
+    <div class="container">
+      <div class="gal" data-stagger>
+        {media.map((m, i) => (
+          <button class="gal__item" data-lb={i} data-full={m.full} aria-label={`Open image ${i + 1} of ${media.length}`}>
+            <Image src={m.src} alt={caption(m.key)} widths={[320, 640]} sizes="(max-width: 700px) 45vw, 300px" loading={i < 4 ? 'eager' : 'lazy'} />
+          </button>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <dialog class="lb" data-lightbox aria-label="Image viewer">
+    <button class="lb__x" data-lb-close aria-label="Close">&times;</button>
+    <button class="lb__nav lb__nav--p" data-lb-prev aria-label="Previous image">&#8249;</button>
+    <img data-lb-img src="" alt="" />
+    <button class="lb__nav lb__nav--n" data-lb-next aria-label="Next image">&#8250;</button>
+  </dialog>
+</Base>
+
+<script>
+  const dlg = document.querySelector<HTMLDialogElement>('[data-lightbox]');
+  const view = document.querySelector<HTMLImageElement>('[data-lb-img]');
+  const items = [...document.querySelectorAll<HTMLButtonElement>('[data-lb]')];
+  if (dlg && view && items.length) {
+    let i = 0;
+    const show = (n: number) => {
+      i = (n + items.length) % items.length;
+      const thumb = items[i].querySelector('img');
+      // full-resolution render, with the thumbnail only as a last resort
+      view.src = items[i].dataset.full || thumb?.currentSrc || thumb?.src || '';
+      view.alt = thumb?.alt || '';
+    };
+    items.forEach((b, n) => b.addEventListener('click', () => { show(n); dlg.showModal(); }));
+    document.querySelector('[data-lb-close]')?.addEventListener('click', () => dlg.close());
+    document.querySelector('[data-lb-prev]')?.addEventListener('click', () => show(i - 1));
+    document.querySelector('[data-lb-next]')?.addEventListener('click', () => show(i + 1));
+    dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); });
+    addEventListener('keydown', (e) => {
+      if (!dlg.open) return;
+      if (e.key === 'ArrowRight') show(i + 1);
+      if (e.key === 'ArrowLeft') show(i - 1);
+    });
+  }
+</script>

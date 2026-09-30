@@ -1,0 +1,140 @@
+---
+import { getCollection, render } from 'astro:content';
+import { Image } from 'astro:assets';
+import Base from '~/layouts/Base.astro';
+import Icon from '~/components/Icon.astro';
+import { site } from '~/data/site';
+import { postParam, postUrl, pageUrl } from '~/data/urls';
+import { articleSchema, breadcrumbSchema } from '~/data/schema';
+
+export async function getStaticPaths() {
+  const posts = (await getCollection('blog', (p) => !p.data.draft))
+    .sort((a, b) => b.data.order - a.data.order);
+
+  return posts.map((post, i) => ({
+    params: { slug: postParam(post.id) },
+    props: {
+      post,
+      prev: posts[i - 1] ?? null,
+      next: posts[i + 1] ?? null,
+      related: posts.filter((p) => p.id !== post.id && p.data.category === post.data.category).slice(0, 3),
+    },
+  }));
+}
+
+const { post, prev, next, related } = Astro.props;
+const { data } = post;
+const { Content, headings, remarkPluginFrontmatter } = await render(post);
+
+const path = postUrl(post.id);
+const minutes = remarkPluginFrontmatter?.minutes ?? 4;
+
+const crumbs = [
+  { name: 'Home', url: '/' },
+  { name: 'Blog', url: pageUrl('blog') },
+  { name: data.title, url: path },
+];
+
+const schemas = [
+  articleSchema({
+    title: data.title,
+    description: data.description,
+    url: new URL(path, site.url).href,
+    image: new URL(data.hero.src, site.url).href,
+    published: data.pubDate,
+    modified: data.updatedDate,
+    section: data.category,
+  }),
+  breadcrumbSchema(crumbs),
+];
+const toc = headings.filter((h) => h.depth === 2);
+---
+<Base
+  title={data.seoTitle ?? data.title}
+  description={data.description}
+  path={path}
+  image={data.hero.src}
+  type="article"
+  publishedTime={data.pubDate}
+  modifiedTime={data.updatedDate}
+  schemas={schemas}
+  readbar
+>
+  <section class="page-banner page-banner--post">
+    <div class="container">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <ol>
+          {crumbs.map((c, i) => (
+            <li>{i < crumbs.length - 1 ? <a href={c.url}>{c.name}</a> : <span aria-current="page">{c.name}</span>}</li>
+          ))}
+        </ol>
+      </nav>
+      <span class="chip">{data.category}</span>
+      <h1>{data.title}</h1>
+      <p class="post__meta">
+        <time datetime={data.pubDate.toISOString()}>
+          {data.pubDate.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}
+        </time>
+        <span aria-hidden="true">·</span><span>{minutes} min read</span>
+        <span aria-hidden="true">·</span><span>Reviewed by {site.name}</span>
+      </p>
+    </div>
+  </section>
+
+  <article class="section sec-post">
+    <div class="container post__wrap">
+      <div class="post__main">
+        <figure class="post__featured" data-reveal>
+          <Image src={data.hero} alt={data.heroAlt} widths={[480, 800, 1200]} sizes="(max-width: 900px) 100vw, 780px" loading="eager" fetchpriority="high" />
+        </figure>
+
+        <div class="post-content" data-reveal><Content /></div>
+
+        <aside class="post__cta" data-reveal="zoom">
+          <h3>Concerned about a urology symptom?</h3>
+          <p>Reading helps — a ten-minute consultation answers what an article cannot.</p>
+          <div class="post__cta-row">
+            <a class="btn" href={pageUrl('contact-us')}>Book Appointment</a>
+            <a class="btn btn--soft" href={site.phoneHref}><Icon name="phone" size={16} /> {site.phone}</a>
+          </div>
+        </aside>
+
+        <nav class="post__nav" aria-label="More articles">
+          {prev && <a class="post__nav-a" href={postUrl(prev.id)}><span>← Previous</span><strong>{prev.data.title}</strong></a>}
+          {next && <a class="post__nav-a post__nav-a--r" href={postUrl(next.id)}><span>Next →</span><strong>{next.data.title}</strong></a>}
+        </nav>
+      </div>
+
+      <aside class="post__side">
+        {toc.length > 2 && (
+          <div class="side-card">
+            <h4>On this page</h4>
+            <ul class="toc">{toc.map((h) => <li><a href={`#${h.slug}`}>{h.text}</a></li>)}</ul>
+          </div>
+        )}
+
+        {related.length > 0 && (
+          <div class="side-card">
+            <h4>Related reading</h4>
+            <ul class="side-posts">
+              {related.map((r) => (
+                <li>
+                  <a href={postUrl(r.id)}>
+                    <Image src={r.data.hero} alt="" width={72} height={54} loading="lazy" />
+                    <span>{r.data.title}</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        <div class="side-card side-card--brand">
+          <h4>Speak to the doctor</h4>
+          <p>{site.clinic.name}, {site.clinic.locality}</p>
+          <a class="btn btn--block" href={site.phoneHref}>{site.phone}</a>
+        </div>
+      </aside>
+    </div>
+  </article>
+</Base>

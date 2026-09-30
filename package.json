@@ -1,0 +1,27 @@
+{
+  "name": "dr-raghavendra-kulkarni",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "audit": "node scripts/audit-seo.mjs",
+    "links": "node scripts/check-links.mjs",
+    "qa": "npm run build && npm run audit && npm run links",
+    "build:clean-urls": "URL_STRATEGY=clean astro build"
+  },
+  "dependencies": {
+    "@astrojs/markdown-remark": "^7.3.1",
+    "@astrojs/sitemap": "^3.7.4",
+    "astro": "^7.3.3",
+    "sharp": "^0.35.4"
+  },
+  "devDependencies": {
+    "mdast-util-to-string": "^4.0.0",
+    "node-html-parser": "^9.0.4",
+    "turndown": "^7.2.4"
+  }
+}

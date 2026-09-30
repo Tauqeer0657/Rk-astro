@@ -1,0 +1,207 @@
+---
+import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
+import Base from '~/layouts/Base.astro';
+import Icon from '~/components/Icon.astro';
+import Reviews from '~/components/Reviews.astro';
+import ContactForm from '~/components/ContactForm.astro';
+import Faq from '~/components/Faq.astro';
+import { site, services } from '~/data/site';
+import { stats, excellence, faqs } from '~/data/home';
+import { pageUrl, postUrl } from '~/data/urls';
+import { faqSchema } from '~/data/schema';
+
+import heroDesktop from '~/assets/img/hero-desktop-clean.jpg';
+import heroMobile from '~/assets/img/hero-mobile-clean.jpg';
+import profile from '~/assets/img/profile-photo.jpg';
+import kidneyMicroscope from '~/assets/img/kidney-microscope.jpg';
+
+const svcImages = import.meta.glob<{ default: ImageMetadata }>('~/assets/img/*.jpg', { eager: true });
+const posts = (await getCollection('blog', (p) => !p.data.draft)).sort((a, b) => b.data.order - a.data.order).slice(0, 3);
+const img = (p: string) => svcImages[p.replace('~/', '/src/')]?.default;
+---
+<Base
+  title="Dr Raghavendra Kulkarni | Urologist Doctor | Secunderabad"
+  description="Dr Raghavendra Kulkarni, leading urologist in Secunderabad, offers expert kidney stone treatment, prostate care, laser urology, and minimally invasive surgeries."
+  path="/"
+  image={heroDesktop.src}
+  schemas={[faqSchema(faqs.map((f) => ({ q: f.q, a: f.a })))]}
+>
+  <!-- ===================== HERO ===================== -->
+  <section class="hero">
+    <div class="hero__bg" aria-hidden="true">
+      <picture>
+        <source media="(max-width: 760px)" srcset={heroMobile.src} />
+        <img src={heroDesktop.src} alt="" width={heroDesktop.width} height={heroDesktop.height} fetchpriority="high" decoding="async" />
+      </picture>
+    </div>
+    <div class="container hero__in">
+      <div class="hero__copy">
+        <span class="eyebrow" data-reveal>Asian Institute of Nephrology &amp; Urology, Secunderabad</span>
+        <h1 data-reveal data-delay="1">Urologist Doctor in Secunderabad</h1>
+        <p data-reveal data-delay="2">
+          Compassionate care backed by experience &amp; precision — 28+ years in medicine,
+          14 years dedicated exclusively to urology.
+        </p>
+        <div class="hero__cta" data-reveal data-delay="3">
+          <a class="btn" href={pageUrl('contact-us')}>Book Appointment</a>
+          <a class="btn btn--soft" href={site.phoneHref}><Icon name="phone" size={17} /> {site.phone}</a>
+        </div>
+        <div class="hero__pills" data-stagger>
+          <span>Kidney Stones</span><span>Prostate / BPH</span>
+          <span>Uro-Oncology</span><span>Laser &amp; Laparoscopy</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== STATS ===================== -->
+  <section class="section section--tight">
+    <div class="container">
+      <div class="stats" data-stagger>
+        {stats.map((s) => (
+          <div class="stats__item">
+            <div class="stats__num"><span data-count={s.to} data-suffix={s.suffix}>0</span></div>
+            <div class="stats__label">{s.label}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== INTRO ===================== -->
+  <section class="section intro" id="about">
+    <div class="container intro__grid">
+      <div class="intro__media" data-reveal="left">
+        <Image src={profile} alt="Dr. Raghavendra Kulkarni, Consultant Urologist at AINU Secunderabad" widths={[380, 620]} sizes="(max-width: 900px) 90vw, 520px" loading="lazy" />
+      </div>
+      <div class="intro__copy" data-reveal="right">
+        <span class="eyebrow">Dr. Raghavendra Kulkarni</span>
+        <h2>Senior Consultant Urologist</h2>
+        <p class="intro__sub">Endoscopic, Laser &amp; Laparoscopic Surgeon</p>
+        <p>
+          At the Asian Institute of Nephrology and Urology, Secunderabad, Dr. Raghavendra Kulkarni is
+          known not only for his clinical excellence, but also for the warmth, trust, and reassurance he
+          brings to every patient interaction. With over 28 years of experience in medicine and 14 years
+          dedicated exclusively to Urology, he has become a trusted name for patients seeking ethical,
+          advanced, and patient-focused urological care.
+        </p>
+        <p>
+          Dr. Kulkarni believes that successful treatment begins with understanding the patient
+          completely — their symptoms, concerns, lifestyle, and expectations. His calm and approachable
+          nature helps patients feel comfortable discussing even the most sensitive urological problems
+          with confidence.
+        </p>
+        <div class="intro__cta">
+          <a class="btn" href={pageUrl('about-us')}>Know More</a>
+          <a class="btn btn--soft" href={site.whatsapp} target="_blank" rel="noopener">Book Appointment</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== SERVICES ===================== -->
+  <section class="section sec-services" id="services">
+    <div class="container">
+      <header class="sec-head" data-reveal>
+        <span class="eyebrow">Our Services</span>
+        <h2>Specialized Urology Services</h2>
+      </header>
+      <div class="svc__grid" data-stagger>
+        {services.map((s) => (
+          <a class="svc-card" href={pageUrl(s.slug)}>
+            <div class="svc-card__img">
+              <Image src={img(s.image)!} alt={s.title} widths={[300, 560]} sizes="(max-width: 700px) 90vw, 300px" loading="lazy" />
+            </div>
+            <h3>{s.title}</h3>
+            <p>{s.short}</p>
+            <span class="svc-card__go">Read more <Icon name="arrow" size={16} /></span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== EXCELLENCE ===================== -->
+  <section class="section section--lavender sec-excellence">
+    <div class="container">
+      <header class="sec-head" data-reveal>
+        <span class="eyebrow">Why Patients Choose Us</span>
+        <h2>Excellence in Urological Care</h2>
+      </header>
+      {/* Columns converge inward — left list from the left, right list from
+          the right, artwork zooming between them. Mirrors the live site's
+          `feature reveal--left/--right` + `excellence__media reveal--zoom`. */}
+      <div class="exc__grid">
+        <ul class="exc__col">
+          {excellence.slice(0, 3).map((e, i) => (
+            <li data-reveal="left" data-delay={i || undefined}>
+              <i><Icon name="check" size={14} /></i><div><h3>{e.title}</h3><p>{e.body}</p></div>
+            </li>
+          ))}
+        </ul>
+        <div class="exc__media" data-reveal="zoom" data-delay="1">
+          <Image src={kidneyMicroscope} alt="Urologist examining an anatomical kidney model" widths={[320, 560]} sizes="(max-width: 900px) 80vw, 420px" loading="lazy" />
+        </div>
+        <ul class="exc__col">
+          {excellence.slice(3).map((e, i) => (
+            <li data-reveal="right" data-delay={i || undefined}>
+              <i><Icon name="check" size={14} /></i><div><h3>{e.title}</h3><p>{e.body}</p></div>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <Reviews />
+
+  <!-- ===================== BLOG TEASER ===================== -->
+  <section class="section sec-blog-teaser">
+    <div class="container">
+      <header class="sec-head" data-reveal>
+        <span class="eyebrow">From the Blog</span>
+        <h2>Urology Health Guides</h2>
+      </header>
+      <div class="blog__grid" data-stagger>
+        {posts.map((p) => (
+          <a class="blog-card" href={postUrl(p.id)}>
+            <div class="blog-card__img">
+              <Image src={p.data.hero} alt={p.data.heroAlt} widths={[320, 600]} sizes="(max-width: 700px) 90vw, 340px" loading="lazy" />
+            </div>
+            <span class="chip">{p.data.category}</span>
+            <h3>{p.data.title}</h3>
+            <p>{p.data.description}</p>
+            <span class="svc-card__go">Read More <Icon name="arrow" size={16} /></span>
+          </a>
+        ))}
+      </div>
+      <p class="sec-more" data-reveal><a class="btn btn--soft" href={pageUrl('blog')}>View all articles</a></p>
+    </div>
+  </section>
+
+  <Faq items={faqs} />
+
+  <!-- ===================== CONSULT ===================== -->
+  <section class="section sec-consult" id="contact">
+    <div class="container consult__grid">
+      <div data-reveal="left">
+        <span class="eyebrow">Schedule Your Consultation</span>
+        <h2>Reach Out to Us</h2>
+        <p>
+          Trusted urology care with advanced treatment options focused on comfort, recovery,
+          and long-term wellness.
+        </p>
+        <ul class="footer__c consult__c">
+          <li><i><Icon name="pin" size={17} /></i><address>{site.clinic.name}, {site.clinic.street}, {site.clinic.locality} – {site.clinic.postalCode}</address></li>
+          <li><i><Icon name="phone" size={17} /></i><a href={site.phoneHref}>{site.phone}</a></li>
+          <li><i><Icon name="mail" size={17} /></i><a href={`mailto:${site.email}`}>{site.email}</a></li>
+          <li><i><Icon name="clock" size={17} /></i><span>{site.hoursLabel}</span></li>
+        </ul>
+      </div>
+      <div class="consult__form" data-reveal="right">
+        <ContactForm />
+      </div>
+    </div>
+  </section>
+</Base>
